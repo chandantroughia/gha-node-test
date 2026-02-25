@@ -2,12 +2,34 @@ name: Node CI
 
 on:
     push:
-        branches: [main]
+        branches:
+            - main
     pull_request:
         branches: [main]
 
 jobs:
-    ci:
+    lint:
+        runs-on: ubuntu-latest
+        # strategy:
+        #     matrix:
+        #         node-version: [18.x, 20.x]
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.JS
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+                cache: npm
+
+            - name: Install deps
+              run: npm ci
+
+            - name: Lint
+              run: npm run lint
+    
+    test:
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -19,14 +41,11 @@ jobs:
             - name: Setup Node.JS
               uses: actions/setup-node@v4
               with:
-                node-version: ${{ matrix.node-version }}
+                node-version: 20
                 cache: npm
 
             - name: Install deps
               run: npm ci
-
-            - name: Lint
-              run: npm run lint
 
             - name: Run Test
               run: npm run test
